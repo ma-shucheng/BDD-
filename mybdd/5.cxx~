@@ -1,0 +1,28 @@
+#include <bdd.h>
+#include<stdio.h>
+#include <time.h>
+#include <stdlib.h>
+#include <bvec.h>
+#define varnum 14
+#define tnum 10
+ main(void )
+{
+   using namespace std ;
+int domain[2]={16,16};
+bdd_init(100,100);
+fdd_extdomain(domain,2);
+bvec y=bvec_varfdd(0);
+bvec v=bvec_con(4,10);
+bvec z=bvec_add(y,v);
+y=bvec_
+bvec x=bvec_varfdd(1);
+bdd result=bddtrue;
+
+for(int n=0;n<x.bitnum();n++)
+result &=bdd_apply(x[n],z[n],bddop_biimp);
+cout<<fddset<<endl<<result<<endl<<endl;
+bdd_printtable(result);
+bdd_printset(result);
+cout<<endl;
+}
+

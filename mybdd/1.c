@@ -1,0 +1,81 @@
+#include <bdd.h>
+#define varnum 14
+
+ main(void )
+{
+int i,j,k;
+double f;
+ bdd pn,pnnew;
+ bdd p[14],q[varnum],et[10];
+ bdd_init(1000,100);
+bdd_setvarnum(14);
+
+et[0]=bdd_ithvar(0);
+et[1]=bdd_apply(bdd_ithvar(1),bdd_ithvar(12),bddop_and);
+et[2]=bdd_apply(bdd_ithvar(2),bdd_ithvar(13),bddop_and);
+et[3]=bdd_apply(bdd_ithvar(3),bdd_ithvar(4),bddop_and);
+et[4]=bdd_ithvar(5);
+et[5]=bdd_ithvar(6);
+et[6]=bdd_apply(bdd_ithvar(7),bdd_ithvar(13),bddop_and);
+et[7]=bdd_ithvar(1);
+et[8]=bdd_apply(bdd_ithvar(9),bdd_ithvar(10),bddop_and);
+et[9]=bdd_ithvar(11);
+
+int dat[10][14]={{0,1,1,2,2,2,2,2,2,2,2,2,2,2},
+                      {2,0,2,1,2,2,2,2,2,2,2,2,2,2},
+		      {2,2,0,2,1,2,2,2,2,2,2,2,2,0},
+		      {2,2,2,0,0,1,2,2,2,2,2,2,2,2},
+		      {1,2,2,2,2,0,2,2,2,2,2,2,1,1},
+		      {2,2,2,2,2,2,0,1,1,2,2,2,2,2},
+		      {2,2,2,2,2,2,2,0,2,1,2,2,2,0},
+		      {2,2,2,2,2,2,2,2,0,2,1,2,2,2},
+		      {2,2,2,2,2,2,2,2,2,0,0,1,2,2},
+		      {2,2,2,2,2,2,1,2,2,2,2,0,2,2}};
+
+for(i=0;i<14;i++)
+{
+p[i]=bdd_ithvar(i); 
+}
+pn=bdd_apply(p[0],p[6],bddop_and);
+pn=bdd_apply(pn,p[12],bddop_and);
+pn=bdd_apply(pn,p[13],bddop_and);
+for(i=1;i<6;i++)
+{
+pn=bdd_apply(pn,p[i],bddop_diff);
+}
+for(i=7;i<12;i++)
+{
+pn=bdd_apply(pn,p[i],bddop_diff);
+}
+
+
+
+q[0]=bdd_ithvar(0);
+q[1]=bdd_nithvar(1);
+for(i=2;i<varnum;i++)
+q[i]=p[i];
+pnnew=bdd_addref(bdd_apply(q[0],q[1],bddop_and));
+for(i=2;i<varnum;i++)
+pnnew=bdd_apply(pnnew,q[i],bddop_and);
+pnnew=bdd_apply(pnnew,pn,bddop_or);
+bdd pnnor=bdd_not(pn);
+pnnew=bdd_apply(pnnew,pnnor,bddop_and);
+pn=bdd_apply(pn,pnnew,bddop_or);
+pnnew=pn;
+q[0]=bdd_nithvar(0);
+q[1]=bdd_ithvar(1);
+pnnew=bdd_exist(pnnew,bdd_ithvar(0));
+pnnew=bdd_exist(pnnew,bdd_ithvar(1));
+pnnew=bdd_apply(pnnew,q[0],bddop_and);
+pnnew=bdd_apply(pnnew,q[1],bddop_and);
+pnnew=bdd_apply(pnnew,bdd_ithvar(2),bddop_and);
+bdd_printtable(pn);
+bdd_printtable(pnnew);
+printf("pn is:\n");
+bdd_printset(pn);
+printf("\npnneww is:\n");
+bdd_printset(pnnew);
+f=bdd_satcount(pnnew);
+printf("\n%f\n",f);
+bdd_done();
+}

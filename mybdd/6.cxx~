@@ -1,0 +1,81 @@
+#include <bdd.h>
+#include<stdio.h>
+#include <time.h>
+#include <stdlib.h>
+#include<fstream>
+#define varnum 7
+#define tnum 7
+ main(void )
+{
+ FILE *fp=fopen("result.txt","wb");
+time_t tval;
+struct tm *now;
+	//显示当前时间
+    tval = time(NULL);
+    now = localtime(&tval);
+    printf("现在时间: %4d年 %d月 %02d日 %d:%02d:%02d\n",  now->tm_year+1900,now->tm_mon+1, now->tm_mday, now->tm_hour, now->tm_min,now->tm_sec);
+
+
+int i,j,k,bddnodenum;
+double f;
+ bdd pn,pninit,pnfrom,pnnew,pnto,pnbad,pngood;
+ bdd p[varnum],q[varnum],et[tnum],cet[tnum];
+
+ bdd_init(100000,10000);
+bdd_setvarnum(varnum*2);
+
+ bddPair *pair=bdd_newpair();
+ int oldvar[varnum];
+int newvar[varnum];
+for(i=0;i<varnum;i++)
+{oldvar[i]=i+varnum;
+newvar[i]=i;
+}
+bdd_setpairs(pair,oldvar,newvar,varnum);
+//define M0 ,  transion mix //////////
+int m0[varnum]={1,0,0,0,0,0,0};
+
+//computer the pninit,et,cet/////
+for(i=0;i<varnum;i++)
+{
+p[i]=bdd_ithvar(i); 
+q[i]=bdd_ithvar(i+7);
+}
+pninit=bddtrue;
+for(i=0;i<varnum;i++)
+{if(m0[i]==1)
+pninit=bdd_apply(pninit,bdd_ithvar(i),bddop_and);
+else pninit=bdd_apply(pninit,bdd_nithvar(i),bddop_and);
+}
+printf("The init state is :\n");
+bdd_printset(pninit);
+pn=pninit;
+pnto=pninit;
+pnfrom=pninit;
+
+pnnew=bdd_apply(bdd_not(q[0]),q[1],bddop_and);
+pnnew=bdd_apply(pnnew,q[2],bddop_and);
+pnnew=bdd_apply(pnnew,bdd_apply(q[3],p[3],bddop_biimp),bddop_and);
+pnnew=bdd_apply(pnnew,bdd_apply(q[4],p[4],bddop_biimp),bddop_and);
+pnnew=bdd_apply(pnnew,bdd_apply(q[5],p[5],bddop_biimp),bddop_and);
+pnnew=bdd_apply(pnnew,bdd_apply(q[6],p[6],bddop_biimp),bddop_and);
+pnnew=bdd_apply(pnnew,pninit,bddop_and);
+
+for(i=0;i<varnum;i++)
+pnnew=bdd_exist(pnnew,bdd_ithvar(i));
+pnnew=bdd_replace(pnnew,pair);
+pnto=bdd_apply(pn,pnnew,bddop_or);
+printf("\n pnto is:\n");
+bdd_printset(pnnew);
+pnfrom=bdd_apply(pnto,bdd_not(pn),bddop_and);
+pn=pnto;
+printf("\n pnfrom is:\n");
+bdd_printset(pnfrom);
+
+printf("\nAll missions done!!\n");
+    tval = time(NULL);
+    now = localtime(&tval);
+    printf("现在时间: %4d年 %d月 %02d日 %d:%02d:%02d\n",  now->tm_year+1900,now->tm_mon+1, now->tm_mday, now->tm_hour, now->tm_min,now->tm_sec);
+    printf("Complete successfully!!\n");
+bdd_done();
+}
